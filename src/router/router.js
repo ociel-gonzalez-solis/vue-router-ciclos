@@ -1,38 +1,64 @@
 import { createRouter } from "vue-router";
 import { createWebHashHistory } from "vue-router";
-import AboutPage from "@/modules/pokemon/pages/AboutPage.vue";
-import ListPage from "@/modules/pokemon/pages/ListPage.vue";
-import PokemonPage from "@/modules/pokemon/pages/PokemonPage.vue";
-import NotPageFound from "@/modules/shared/pages/NotPageFound.vue";
 
 const routes = [
   {
     path: "/",
-    component: () =>
-      import(
-        /*webpackChunkName: "ListPage*/ "@/modules/pokemon/pages/ListPage"
-      ),
+    redirect: "/pokemon",
   },
   {
-    path: "/about",
+    path: "/pokemon",
+    name: "pokemon",
     component: () =>
       import(
-        /*webpackChunkName: "AboutPage*/ "@/modules/pokemon/pages/AboutPage"
+        /*webpackChunkName: "AboutPage*/ "@/modules/pokemon/layout/PokemonLayout"
       ),
+    children: [
+      {
+        path: "home",
+        name: "pokemon-home",
+        component: () =>
+          import(
+            /*webpackChunkName: "ListPage*/ "@/modules/pokemon/pages/ListPage"
+          ),
+      },
+      {
+        path: "about",
+        name: "pokemon-about",
+        component: () =>
+          import(
+            /*webpackChunkName: "AboutPage*/ "@/modules/pokemon/pages/AboutPage"
+          ),
+      },
+      {
+        path: "pokemonid/:pokemon_id",
+        name: "pokemon-pokemon_id",
+        component: () =>
+          import(
+            /*webpackChunkName: "PokemonPage*/ "@/modules/pokemon/pages/PokemonPage"
+          ),
+        props: (route) => {
+          const pokemon_id = +route.params.pokemon_id;
+          console.log(route);
+          return isNaN(pokemon_id)
+            ? { pokemon_id: 1 }
+            : { pokemon_id: pokemon_id };
+        },
+      },
+      {
+        path: "",
+        redirect: {name: 'pokemon-about'},
+      },
+    ],
   },
-  {
-    path: "/id",
-    component: () =>
-      import(
-        /*webpackChunkName: "PokemonPage*/ "@/modules/pokemon/pages/PokemonPage"
-      ),
-  },
+
   {
     path: "/:pathMatch(.*)*",
     component: () =>
       import(
         /*webpackChunkName: "NotPageFound*/ "@/modules/shared/pages/NotPageFound"
       ),
+    // redirect: '/home'
   },
 ];
 
